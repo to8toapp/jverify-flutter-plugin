@@ -2,6 +2,8 @@
 #import "JVERIFICATIONService.h"
 // 如果需要使用 idfa 功能所需要引入的头文件（可选）
 #import <AdSupport/AdSupport.h>
+#import "DisagreeAlertViewController.h"
+#import <objc/runtime.h>
 #define UIColorFromRGB(rgbValue)  ([UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0])
 
 
@@ -649,9 +651,26 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     BOOL privacyHintToast = [[self getValue:config key:@"privacyHintToast"] boolValue];
     if(privacyHintToast){
         uiconfig.customPrivacyAlertViewBlock = ^(UIViewController *vc) {
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"请点击同意协议" message:nil preferredStyle:UIAlertControllerStyleAlert];
-            [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil] ];
-            [vc presentViewController:alert animated:true completion:nil];
+            
+            NSDictionary *privacy_linkDic = [vc valueForKey:@"_privacy_linkDic"];
+            NSAttributedString *privacyAttributedString = [vc valueForKey:@"_privacyAttributedString"];
+            
+            
+            DisagreeAlertViewController *alert = [[DisagreeAlertViewController alloc] init];
+            alert.privacy_linkDic = privacy_linkDic;
+            alert.privacyAttributedString = privacyAttributedString;
+            alert.agreeCallBack = ^(){
+                [vc setValue:@(YES) forKey:@"_checked"];
+                UIButton *loginButon = [vc valueForKey:@"_loginButton"];
+                [loginButon sendActionsForControlEvents:UIControlEventTouchUpInside];
+                
+            };
+            alert.tapPrivacyWithStringCallBack = ^(NSString * _Nonnull str){
+                SEL sel = NSSelectorFromString(@"tapPrivacyWithString:");
+                [vc performSelector:sel withObject:str];
+            };
+            alert.modalPresentationStyle = UIModalPresentationOverFullScreen;
+            [vc presentViewController:alert animated:YES completion:nil];
             
         };
     }
@@ -1105,6 +1124,18 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
         _customWidgetIdDic  = [NSMutableDictionary dictionary];
     }
     return _customWidgetIdDic;
+}
+
+- (void)printAllMethod:(id)obj {
+    unsigned int count = 0;
+    //所有在.m文件显式实现的方法都会被找到
+    Method *mets = class_copyMethodList([obj class], &count);
+    for(int i=0;i<count;i++){
+        NSString *str = [NSString stringWithCString:method_getTypeEncoding(mets[i]) encoding:NSUTF8StringEncoding];
+        SEL sel = method_getName(mets[i]);
+        NSString *name = [NSString stringWithCString:sel_getName(sel) encoding:NSUTF8StringEncoding];
+        NSLog(@"方法名：%@\n属性：%@",name,str);
+    }
 }
 
 @end

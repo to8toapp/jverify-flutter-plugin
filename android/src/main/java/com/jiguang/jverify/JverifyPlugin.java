@@ -1,5 +1,10 @@
 package com.jiguang.jverify;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.Application;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -8,15 +13,22 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.cmic.sso.sdk.activity.LoginAuthActivity;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -67,19 +79,103 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
     private Context context;
     private MethodChannel channel;
 
+    public static Activity currentActivity;
+
+    View.OnClickListener originalLoginOnClick;
+    EasyLoginCheckTipsDialog mCheckTipsDialog;
+    CheckBox mCheckBox;
 
     @Override
     public void onAttachedToEngine( FlutterPluginBinding flutterPluginBinding) {
         channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "jverify");
         channel.setMethodCallHandler(this);
         context = flutterPluginBinding.getApplicationContext();
+        if (context instanceof Application) {
+            Application application = (Application) context;
+            registerActivityLifecycleCallbacks(application);
+        }
     }
 
+    /**
+     * 注册activity生命周期回调监听，用于在一键登录页面（LoginAuthActivity）显示后，对页面不同意协议的自定义处理
+     */
+    private void  registerActivityLifecycleCallbacks(Application application) {
+        application.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+
+            }
+
+            @Override
+            public void onActivityStarted(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityResumed(final Activity activity) {
+                currentActivity = activity;
+                if (activity instanceof LoginAuthActivity) {
+                    LoginAuthActivity loginAuthActivity = (LoginAuthActivity)activity;
+                    hookLoginAuthActivityDisagreeHandle(loginAuthActivity);
+                }
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity) {
+
+            }
+        });
+    }
+
+    /**
+     * 自定义一键登录页面（LoginAuthActivity）对不同意协议的自定义处理：弹框提示
+     */
+    private void hookLoginAuthActivityDisagreeHandle(LoginAuthActivity loginAuthActivity) {
+        FrameLayout  view =  (FrameLayout)loginAuthActivity.getWindow().getDecorView();
+        final View button = view.findViewById(1007);
+        final TextView textView = view.findViewById(1010);
+        ViewGroup textViewParent = (ViewGroup)textView.getParent();
+        View temp = textViewParent.getChildAt(0);
+        if (temp instanceof CheckBox) {
+            mCheckBox = (CheckBox)temp;
+        }
+        if (button != null) {
+            originalLoginOnClick = OnClickListenerProxy.hookOnClickListener(button, new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    mCheckTipsDialog = new EasyLoginCheckTipsDialog(currentActivity, textView.getText(), new EasyLoginCheckTipsDialog.IOnEasyLoginListener() {
+                        @Override
+                        public void onAgreeClicked() {
+                            mCheckBox.setChecked(true);
+                            originalLoginOnClick.onClick(button);
+                        }
+                    });
+                    mCheckTipsDialog.show();
+                }
+            });
+        }
+    }
 
     @Override
     public void onDetachedFromEngine( FlutterPluginBinding binding) {
         channel.setMethodCallHandler(null);
     }
+
 
 
     @Override

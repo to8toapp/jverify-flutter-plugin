@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/constraint_root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/white">
+
+        <ImageView
+            android:id="@+id/iv_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:padding="14dp"
+            android:src="@drawable/icon_case_feedback_close" />
+
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="28dp"
+            android:paddingBottom="13dp"
+            android:text="温馨提示"
+            android:textColor="#ff333333"
+            android:textSize="20sp" />
+
+
+        <TextView
+            android:id="@+id/tv_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_title"
+            android:lineSpacingExtra="5dp"
+            android:paddingHorizontal="20dp"
+            android:text="阅读并同意中国联通认证服务协议、土巴兔用户服务协议和隐私政策可继续登录。"
+            android:textColor="#ff666666"
+            android:textSize="14sp" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_content"
+            android:layout_marginTop="35dp"
+            android:layout_marginBottom="28dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+
+            <Button
+                android:id="@+id/btn_cancel"
+                android:layout_width="100dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="20dp"
+                android:gravity="center"
+                android:paddingLeft="16dp"
+                android:paddingTop="10dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="10dp"
+                android:text="取消"
+                android:background="#ffF5F7FA"
+                android:textColor="#878b99"/>
+
+
+            <Button
+                android:id="@+id/btn_agree"
+                android:layout_width="100dp"
+                android:layout_height="42dp"
+                android:gravity="center"
+                android:paddingLeft="16dp"
+                android:paddingTop="10dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="10dp"
+                android:text="同意"
+                android:background="#ff06c792"
+                android:textColor="#ffffffff"/>
+        </LinearLayout>
+
+    </RelativeLayout>
+</LinearLayout>
