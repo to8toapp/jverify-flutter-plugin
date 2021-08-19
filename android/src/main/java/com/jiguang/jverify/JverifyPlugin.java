@@ -158,6 +158,10 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
             originalLoginOnClick = OnClickListenerProxy.hookOnClickListener(button, new View.OnClickListener() {
                 @Override
                 public void onClick(final View v) {
+                    if (mCheckBox.isChecked()) {
+                        originalLoginOnClick.onClick(button);
+                        return;
+                    }
                     mCheckTipsDialog = new EasyLoginCheckTipsDialog(currentActivity, textView.getText(), new EasyLoginCheckTipsDialog.IOnEasyLoginListener() {
                         @Override
                         public void onAgreeClicked() {
