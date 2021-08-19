@@ -666,6 +666,7 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
                 
             };
             alert.tapPrivacyWithStringCallBack = ^(NSString * _Nonnull str){
+                [alert dismissViewControllerAnimated:YES completion:nil];
                 SEL sel = NSSelectorFromString(@"tapPrivacyWithString:");
                 [vc performSelector:sel withObject:str];
             };
