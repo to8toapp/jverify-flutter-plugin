@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.jiguang.verifysdk.CtLoginActivity;
 import cn.jiguang.verifysdk.api.AuthPageEventListener;
 import cn.jiguang.verifysdk.api.JVerificationInterface;
 import cn.jiguang.verifysdk.api.JVerifyUIClickCallback;
@@ -114,9 +115,8 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
             @Override
             public void onActivityResumed(final Activity activity) {
                 currentActivity = activity;
-                if (activity instanceof LoginAuthActivity) {
-                    LoginAuthActivity loginAuthActivity = (LoginAuthActivity)activity;
-                    hookLoginAuthActivityDisagreeHandle(loginAuthActivity);
+                if (activity instanceof LoginAuthActivity || activity instanceof CtLoginActivity) {
+                    hookLoginAuthActivityDisagreeHandle(activity);
                 }
             }
 
@@ -145,7 +145,7 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
     /**
      * 自定义一键登录页面（LoginAuthActivity）对不同意协议的自定义处理：弹框提示
      */
-    private void hookLoginAuthActivityDisagreeHandle(LoginAuthActivity loginAuthActivity) {
+    private void hookLoginAuthActivityDisagreeHandle(Activity loginAuthActivity) {
         FrameLayout  view =  (FrameLayout)loginAuthActivity.getWindow().getDecorView();
         final View button = view.findViewById(1007);
         final TextView textView = view.findViewById(1010);
