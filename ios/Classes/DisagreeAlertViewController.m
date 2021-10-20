@@ -13,6 +13,10 @@ static const NSString *kPrivacyProtocol = @"隐私政策";
 
 @interface DisagreeAlertViewController ()<UITextViewDelegate>
 
+@property (nonatomic, strong) UIView *alertView;
+@property (nonatomic, assign) CGFloat viewWidth;
+@property (nonatomic, assign) CGFloat viewHeight;
+
 @end
 
 @implementation DisagreeAlertViewController
@@ -20,21 +24,31 @@ static const NSString *kPrivacyProtocol = @"隐私政策";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    _viewWidth = UIApplication.sharedApplication.keyWindow.frame.size.width - 30 * 2;
+    _viewHeight = _viewWidth/1.4;
+    _alertView = [self alertContenView];
+    
     self.view.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
-    [self.view addSubview:[self alertContenView]];
+    [self.view addSubview:_alertView];
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [UIView animateWithDuration:0.2 animations:^{
+        self.alertView.frame = CGRectMake(30, (UIApplication.sharedApplication.keyWindow.frame.size.height-_viewHeight)/2.0, _viewWidth, _viewHeight);
+    }];
+    
 }
 
 - (UIView *)alertContenView{
-    
-    CGFloat screenWidth = UIApplication.sharedApplication.keyWindow.frame.size.width;
-    
-    CGFloat w = screenWidth - 30 * 2;
-    UIView *alertView = [[UIView alloc] initWithFrame:CGRectMake(30, 0, screenWidth - 30 * 2, w / 1.4)];//315x226
+        
+    UIView *alertView = [[UIView alloc] initWithFrame:CGRectMake(UIApplication.sharedApplication.keyWindow.frame.size.width/2, UIApplication.sharedApplication.keyWindow.frame.size.height/2, 0, 0)];//315x226
     alertView.backgroundColor = [UIColor whiteColor];
     alertView.layer.cornerRadius = 6.0;
-    alertView.center = self.view.center;
+    alertView.layer.masksToBounds = YES;
     
-    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 28, w, 28)];
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 28, _viewWidth, 28)];
     if (@available(iOS 8.2, *)) {
         titleLabel.font = [UIFont systemFontOfSize:20 weight:UIFontWeightMedium];
     }
@@ -43,24 +57,9 @@ static const NSString *kPrivacyProtocol = @"隐私政策";
     titleLabel.text = @"温馨提示";
     [alertView addSubview:titleLabel];
     
-//    UIButton *closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-//    [closeButton setImage:[UIImage imageNamed:@"message_notifcation_close_icon"] forState:UIControlStateNormal];
-//    //@weakify(self);
-////    [[closeButton rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(__kindof UIControl * _Nullable x) {
-////        dismissMaskBlock(NO);
-////    }];
-//    [alertView addSubview:closeButton];
-//    [closeButton mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.top.mas_offset(8);
-//        make.right.mas_offset(-8);
-//        make.size.mas_equalTo(CGSizeMake(24, 24));
-//    }];
     
     
-    
-    
-    
-    UITextView  *textView = [[UITextView alloc] initWithFrame:CGRectMake(24, 69, (w - 48), 65)];
+    UITextView  *textView = [[UITextView alloc] initWithFrame:CGRectMake(24, 69, (_viewWidth - 48), 65)];
     textView.backgroundColor = [UIColor clearColor];
     textView.delegate = self;
     textView.editable = NO;
@@ -70,12 +69,12 @@ static const NSString *kPrivacyProtocol = @"隐私政策";
     NSMutableAttributedString *attributed = [[NSMutableAttributedString alloc] initWithString:protocol];
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
     paragraphStyle.lineSpacing = 6;// 字体的行间距
-    [attributed addAttributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14], NSParagraphStyleAttributeName:paragraphStyle} range:NSMakeRange(0, attributed.string.length)];
+    [attributed addAttributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14], NSForegroundColorAttributeName: [UIColor colorWithRed:0.53 green:0.55 blue:0.53 alpha:1], NSParagraphStyleAttributeName:paragraphStyle} range:NSMakeRange(0, attributed.string.length)];
     [self.privacy_linkDic enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
         [self addProtocolAttributesFor:attributed withString:key withUrl:obj];
     }];
     textView.attributedText = attributed;
-    textView.linkTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.53 green:0.55 blue:0.53 alpha:1]};
+    textView.linkTextAttributes = @{NSForegroundColorAttributeName: [UIColor blackColor]};
     [alertView addSubview:textView];
     
     UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -91,7 +90,7 @@ static const NSString *kPrivacyProtocol = @"隐私政策";
     [alertView addSubview:cancelButton];
     
     UIButton *confirmButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    confirmButton.frame = CGRectMake(w - 40 - 106, 160, 106, 42);
+    confirmButton.frame = CGRectMake(_viewWidth - 40 - 106, 160, 106, 42);
     [confirmButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [confirmButton setTitle:@"同意" forState:UIControlStateNormal];
     confirmButton.backgroundColor = [UIColor colorWithRed:0.14 green:0.777 blue:0.49 alpha:1];
@@ -113,12 +112,18 @@ static const NSString *kPrivacyProtocol = @"隐私政策";
 }
 
 - (void)close{
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [UIView animateWithDuration:0.2 animations:^{
+        self.alertView.frame = CGRectMake(UIApplication.sharedApplication.keyWindow.frame.size.width/2, UIApplication.sharedApplication.keyWindow.frame.size.height/2, 0, 0);
+    } completion:^(BOOL finished) {
+        [self dismissViewControllerAnimated:NO completion:nil];
+    }];
 }
 
 - (void)agree{
-    self.agreeCallBack();
     [self close];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.25 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        self.agreeCallBack();
+    });
 }
 
 - (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange{

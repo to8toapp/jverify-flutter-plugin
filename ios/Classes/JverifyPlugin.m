@@ -671,7 +671,7 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
                 [vc performSelector:sel withObject:str];
             };
             alert.modalPresentationStyle = UIModalPresentationOverFullScreen;
-            [vc presentViewController:alert animated:YES completion:nil];
+            [vc presentViewController:alert animated:NO completion:nil];
             
         };
     }
