@@ -4,6 +4,7 @@
 #import <AdSupport/AdSupport.h>
 #import "DisagreeAlertViewController.h"
 #import <objc/runtime.h>
+#import "UIButton+ButtonExpend.h"
 #define UIColorFromRGB(rgbValue)  ([UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0])
 
 
@@ -36,7 +37,7 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     JVLog(@"Action - handleMethodCall: %@",call.method);
-    
+
     NSString *methodName = call.method;
     if ([methodName isEqualToString:@"setup"]) {
         [self setup:call result:result];
@@ -106,7 +107,7 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
 #pragma mark - 设置日志 debug 模式
 -(void)setDebugMode:(FlutterMethodCall*) call result:(FlutterResult)result{
     JVLog(@"Action - setDebugMode::");
-    
+
     NSDictionary *arguments = call.arguments;
     NSNumber *debug = arguments[@"debug"];
     [JVERIFICATIONService setDebug:[debug boolValue]];
@@ -120,7 +121,7 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
     NSString *channel = arguments[@"channel"];
     NSNumber *useIDFA = arguments[@"useIDFA"];
     NSNumber *timeout = arguments[@"timeout"];
-    
+
     JVAuthConfig *config = [[JVAuthConfig alloc] init];
     if (![appKey isKindOfClass:[NSNull class]]) {
         config.appKey = appKey;
@@ -133,7 +134,7 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
         timeout = @(10000);
     }
     config.timeout = [timeout longLongValue];
-    
+
     NSString *idfaStr = NULL;
     if(![useIDFA isKindOfClass:[NSNull class]]){
         if([useIDFA boolValue]){
@@ -141,7 +142,7 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
             config.advertisingId = idfaStr;
         }
     }
-    
+
     __weak typeof(self) weakself = self;
     config.authBlock = ^(NSDictionary *result) {
         JVLog(@"初始化结果 result:%@", result);
@@ -170,7 +171,7 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
     dispatch_async(dispatch_get_main_queue(), ^{
         result(@{j_result_key:[NSNumber numberWithBool:isSetup]});
     });
-    
+
     // 初始换成功
     //···
     return isSetup;
@@ -186,7 +187,7 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
     dispatch_async(dispatch_get_main_queue(), ^{
         result(@{j_result_key:[NSNumber numberWithBool:isEnable]});
     });
-    
+
     //继续获取token操作
     //...
     return isEnable;
@@ -195,14 +196,14 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
 #pragma mark - 获取号码认证token
 -(void)getToken:(FlutterMethodCall*)call result:(FlutterResult)result{
     JVLog(@"Action - getToken::%@",call.arguments);
-    
+
     NSDictionary *arguments=  [call arguments];
     NSNumber *timeoutNum = arguments[@"timeout"];
     NSTimeInterval timeout = [timeoutNum longLongValue];
     if (timeout <= 0) {
         timeout = j_default_timeout;
     }
-    
+
     /*
      参数说明
      timeout 超时时间。单位ms，合法范围3000~10000。
@@ -210,11 +211,11 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
         res 字典
             获取到token时，key 有 code、token、operator 字段，
             获取不到token时，key 为 code 、content 字段
-     
+
      */
     [JVERIFICATIONService getToken:timeout completion:^(NSDictionary *res) {
         JVLog(@"sdk getToken completion : %@",res);
-        
+
         NSString *content = @"";
         if(res[@"token"]){
             content =res[@"token"];
@@ -226,7 +227,7 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
                                j_msg_key : content,
                                j_opr_key : res[@"operator"] ? res[@"operator"] : @""
                                };
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
             result(dict);
         });
@@ -241,7 +242,7 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
     NSDictionary *arguments=  [call arguments];
     NSString *phone = arguments[@"phone"];
     NSString *token = arguments[@"token"];
-    
+
     [JVERIFICATIONService ]
     JVAuthEntity *entity = [[JVAuthEntity alloc] init];
     entity.number = phone;
@@ -250,10 +251,10 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
             entity.token = token;
         }
     }
-    
+
     [JVERIFICATIONService verifyNumber:entity result:^(NSDictionary *res) {
         JVLog(@"sdk verifyNumber completion : %@",res);
-        
+
         NSDictionary *dict = @{
                                j_code_key:res[@"code"],
                                j_msg_key :res[@"content"] ? res[@"content"] : @""
@@ -267,14 +268,14 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
 #pragma mark - SDK 登录预取号
 - (void)preLogin:(FlutterMethodCall*) call result:(FlutterResult)result {
     JVLog(@"Action - preLogin::%@",call.arguments);
-    
+
     NSDictionary *arguments=  [call arguments];
     NSNumber *timeoutNum = arguments[@"timeout"];
     NSTimeInterval timeout = [timeoutNum longLongValue];
     if (timeout <= 0) {
         timeout = j_default_timeout;
     }
-    
+
     /*
      参数说明:
         completion 预取号结果
@@ -283,7 +284,7 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
      */
     [JVERIFICATIONService preLogin:timeout completion:^(NSDictionary *res) {
         JVLog(@"sdk preLogin completion :%@",res);
-        
+
         NSDictionary *dict = @{
                                j_code_key:res[@"code"],
                                j_msg_key :res[@"message"] ? res[@"message"] : @""
@@ -314,20 +315,20 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
     NSDictionary *arguments = [call arguments];
     NSNumber *hide = arguments[@"autoDismiss"];
     NSTimeInterval timeout = [arguments[@"timeout"] longLongValue];
-    
+
     UIViewController *vc = [UIApplication sharedApplication].keyWindow.rootViewController;
-    
+
     __weak typeof(self) weakself = self;
     [JVERIFICATIONService getAuthorizationWithController:vc hide:[hide boolValue] animated:needStartAnim timeout:timeout completion:^(NSDictionary *res) {
         JVLog(@"getAuthorizationWithController result = %@",res);
-        
+
         NSString *content = @"";
         if(res[@"loginToken"]){
             content =res[@"loginToken"];
         }else if(res[@"content"]){
             content = res[@"content"];
         }
-        
+
         NSDictionary *dict = @{
                                j_code_key:res[@"code"],
                                j_msg_key :content,
@@ -360,21 +361,21 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
 -(void)dismissLoginController:(FlutterMethodCall*) call result:(FlutterResult)result{
     JVLog(@"Action - dismissLoginController::");
     [JVERIFICATIONService dismissLoginControllerAnimated:needCloseAnim completion:^{
-        
+
     }];
 }
 
 #pragma mark - 自定义授权页面所有的 UI （包括：原有的、新加的）
 -(void)setCustomAuthViewAllWidgets:(FlutterMethodCall*) call result:(FlutterResult)result {
     JVLog(@"Action - setCustomAuthViewAllWidgets:%@",call.arguments);
-    
+
     NSDictionary *uiconfig = call.arguments[@"uiconfig"];
     NSArray *widgets = call.arguments[@"widgets"];
     [self layoutUIConfig:uiconfig widgets:widgets isAutorotate:NO];
 }
 - (void)setCustomAuthorizationView:(FlutterMethodCall*) call result:(FlutterResult)result {
     JVLog(@"Action - setCustomAuthorizationView:%@",call.arguments);
-    
+
     BOOL isAutorotate = [call.arguments[@"isAutorotate"] boolValue];
     NSDictionary *portraitConfig = call.arguments[@"portraitConfig"];
     NSArray *widgets = call.arguments[@"widgets"];
@@ -382,12 +383,12 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
 }
 
 - (void)layoutUIConfig:(NSDictionary *)uiconfigPara widgets:(NSArray *)widgets isAutorotate:(BOOL)isAutorotate {
-   
+
     JVUIConfig *config = [[JVUIConfig alloc] init];
     config.autoLayout = YES;
-    
+
     [self setCustomUIWithUIConfig:config configArguments:uiconfigPara];
-    
+
     [JVERIFICATIONService customUIWithConfig:config customViews:^(UIView *customAreaView) {
         for (NSDictionary *widgetDic in widgets) {
             NSString *type = [self getValue:widgetDic key:@"type"];
@@ -396,11 +397,13 @@ NSObject<FlutterPluginRegistrar>* _jv_registrar;
             }else if ([type isEqualToString:@"button"]){
                 [customAreaView addSubview:[self addCustomButtonWidget:widgetDic]];
             }else{
-                
+
             }
         }
+
     }];
 }
+
 #pragma mark - 自定义授权页面原有的 UI 控件
 
 JVLayoutConstraint *JVLayoutTop(CGFloat top,JVLayoutItem toItem,NSLayoutAttribute attr2) {
@@ -430,24 +433,24 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     uiconfig.preferredStatusBarStyle = [self getStatusBarStyle:authStatusBarStyle];
     uiconfig.agreementPreferredStatusBarStyle = [self getStatusBarStyle:privacyStatusBarStyle];
     uiconfig.dismissAnimationFlag = needCloseAnim;
-    
+
     /************** 弹出方式 ***************/
     UIModalTransitionStyle transitionStyle = [self getTransitionStyle:[self getValue:config key:@"modelTransitionStyle"]];
     uiconfig.modalTransitionStyle = transitionStyle;
-    
+
      /************** 背景 ***************/
     NSString *authBackgroundImage = [config objectForKey:@"authBackgroundImage"];
     authBackgroundImage = authBackgroundImage?:nil;
     if (authBackgroundImage) {
         uiconfig.authPageBackgroundImage = [UIImage imageNamed:authBackgroundImage];
     }
-    
+
     needStartAnim = [[self getValue:config key:@"needCloseAnim"] boolValue];
     needCloseAnim = [[self getValue:config key:@"needCloseAnim"] boolValue];
-       
+
     JVLog(@"Action - setCustomAuthorizationView:needStartAnim %d",needStartAnim);
     JVLog(@"Action - setCustomAuthorizationView:needStartAnim %d",needCloseAnim);
-    
+
      /************** 导航栏 ***************/
     NSNumber *navHidden = [self getValue:config key:@"navHidden"];
     if (navHidden) {
@@ -457,12 +460,12 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     if (navReturnBtnHidden) {
         uiconfig.navReturnHidden = [navReturnBtnHidden boolValue];
     }
-    
+
     NSNumber *navColor = [self getValue:config key:@"navColor"];
     if (navColor) {
         uiconfig.navColor  = UIColorFromRGB([navColor intValue]);
     }
-    
+
     NSString *navText = [self getValue:config key:@"navText"];
     if (!navText) {
         navText = @"登录";
@@ -474,7 +477,7 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     NSDictionary *navTextAttr = @{NSForegroundColorAttributeName:navTextColor};
     NSAttributedString *attr = [[NSAttributedString alloc]initWithString:navText attributes:navTextAttr];
     uiconfig.navText = attr;
-    
+
     NSString *imageName =[self getValue:config key:@"navReturnImgPath"];
     if(imageName){
         uiconfig.navReturnImg  = [UIImage imageNamed:imageName];
@@ -484,7 +487,7 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
         uiconfig.navTransparent = [navTransparent boolValue];
     }
     uiconfig.navReturnHidden = NO;
-    
+
     /************** logo ***************/
     JVLayoutItem logoLayoutItem = [self getLayotItem:[self getValue:config key:@"logoVerticalLayoutItem"]];
     NSNumber *logoWidth = [self getNumberValue:config key:@"logoWidth"];
@@ -496,26 +499,26 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
         uiconfig.logoHeight = [logoHeight floatValue];
         uiconfig.logoOffsetY = [logoOffsetY floatValue];
     }else{
-        
+
         JVLayoutConstraint *logo_cons_x = JVLayoutCenterX([logoOffsetX floatValue]);
         JVLayoutConstraint *logo_cons_y = JVLayoutTop([logoOffsetY floatValue],logoLayoutItem,NSLayoutAttributeTop);
         JVLayoutConstraint *logo_cons_w = JVLayoutWidth([logoWidth floatValue]);
         JVLayoutConstraint *logo_cons_h = JVLayoutHeight([logoHeight floatValue]);
-        
+
         uiconfig.logoConstraints = @[logo_cons_x,logo_cons_y,logo_cons_w,logo_cons_h];
         uiconfig.logoHorizontalConstraints = uiconfig.logoConstraints;
     }
-    
+
     NSString *logoImgPath =[self getValue:config key:@"logoImgPath"];
     if(logoImgPath){
         uiconfig.logoImg  = [UIImage imageNamed:logoImgPath];
     }
-    
+
     NSNumber *logoHidden = [self getValue:config key:@"logoHidden"];
     if(logoHidden){
         uiconfig.logoHidden  = [logoHidden boolValue];
     }
-    
+
     /************** num ***************/
     JVLayoutItem numberLayoutItem = [self getLayotItem:[self getValue:config key:@"numberVerticalLayoutItem"]];
     NSNumber *numFieldOffsetX = [self getNumberValue:config key:@"numFieldOffsetX"];
@@ -529,21 +532,21 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
         JVLayoutConstraint *num_cons_y = JVLayoutTop([numFieldOffsetY floatValue],numberLayoutItem,NSLayoutAttributeBottom);
         JVLayoutConstraint *num_cons_w = JVLayoutWidth([numberFieldWidth floatValue]);
         JVLayoutConstraint *num_cons_h = JVLayoutHeight([numberFieldHeight floatValue]);
-        
+
         uiconfig.numberConstraints = @[num_cons_x,num_cons_y,num_cons_w,num_cons_h];
         uiconfig.numberHorizontalConstraints = uiconfig.numberConstraints;
     }
-    
+
     NSNumber *numberColor = [self getValue:config key:@"numberColor"];
     if(numberColor){
         uiconfig.numberColor  = UIColorFromRGB([numberColor intValue]);
     }
-    
+
     NSNumber *numberSize = [self getValue:config key:@"numberSize"];
     if (numberSize) {
         uiconfig.numberFont = [UIFont systemFontOfSize:[numberSize floatValue]];
     }
-    
+
     /************** slogan ***************/
     JVLayoutItem sloganLayoutItem = [self getLayotItem:[self getValue:config key:@"sloganVerticalLayoutItem"]];
     NSNumber *sloganOffsetX = [self getNumberValue:config key:@"sloganOffsetX"];
@@ -563,17 +566,17 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
         uiconfig.sloganConstraints = @[slogan_cons_top,slogan_cons_centerx,slogan_cons_width,slogan_cons_height];
         uiconfig.sloganHorizontalConstraints = uiconfig.sloganConstraints;
     }
-    
+
     NSNumber *sloganTextColor = [self getValue:config key:@"sloganTextColor"];
     if(sloganTextColor){
         uiconfig.sloganTextColor  = UIColorFromRGB([sloganTextColor integerValue]);
     }
-    
+
     NSNumber *sloganTextSize = [self getValue:config key:@"sloganTextSize"];
     if (sloganTextSize) {
         uiconfig.sloganFont = [UIFont systemFontOfSize:[sloganTextSize floatValue]];
     }
-    
+
     /************** login btn ***************/
     JVLayoutItem logBtnLayoutItem = [self getLayotItem:[self getValue:config key:@"logBtnVerticalLayoutItem"]];
     NSNumber *logBtnOffsetX = [self getNumberValue:config key:@"logBtnOffsetX"];
@@ -587,11 +590,11 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
         JVLayoutConstraint *logoBtn_cons_y = JVLayoutTop([logBtnOffsetY floatValue], logBtnLayoutItem,NSLayoutAttributeBottom);
         JVLayoutConstraint *logoBtn_cons_w = JVLayoutWidth([logBtnWidth floatValue]);
         JVLayoutConstraint *logoBtn_cons_h = JVLayoutHeight([logBtnHeight floatValue]);
-        
+
         uiconfig.logBtnConstraints  = @[logoBtn_cons_x,logoBtn_cons_y,logoBtn_cons_w,logoBtn_cons_h];
         uiconfig.logBtnHorizontalConstraints  = uiconfig.logBtnConstraints;
     }
-    
+
     NSString *logBtnText = [self getValue:config key:@"logBtnText"];
     if(logBtnText){
         uiconfig.logBtnText  = logBtnText;
@@ -604,7 +607,7 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     if(logBtnTextColor){
         uiconfig.logBtnTextColor  = UIColorFromRGB([logBtnTextColor integerValue]);
     }
-    
+
     NSString *loginBtnNormalImage = [config objectForKey:@"loginBtnNormalImage"];
     loginBtnNormalImage = loginBtnNormalImage?:nil;
     NSString *loginBtnPressedImage = [config objectForKey:@"loginBtnPressedImage"];
@@ -613,31 +616,31 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     loginBtnUnableImage = loginBtnUnableImage?:nil;
     NSArray * images =[[NSArray alloc]initWithObjects:[UIImage imageNamed:loginBtnNormalImage],[UIImage imageNamed:loginBtnPressedImage],[UIImage imageNamed:loginBtnUnableImage],nil];
     uiconfig.logBtnImgs = images;
-    
+
     /************** chck box ***************/
     CGFloat privacyCheckboxSize = [[self getNumberValue:config key:@"privacyCheckboxSize"] floatValue];
     if (privacyCheckboxSize == 0) {
         privacyCheckboxSize = 20.0;
     }
     BOOL privacyCheckboxInCenter = [[self getValue:config key:@"privacyCheckboxInCenter"] boolValue];
-    
-    JVLayoutConstraint *box_cons_x = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemPrivacy attribute:NSLayoutAttributeLeft multiplier:1 constant:0];
-    JVLayoutConstraint *box_cons_y = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemPrivacy attribute:NSLayoutAttributeTop multiplier:1 constant:3];
+
+    JVLayoutConstraint *box_cons_x = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemSuper attribute:NSLayoutAttributeLeft multiplier:1 constant:20];
+    JVLayoutConstraint *box_cons_y = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemPrivacy attribute:NSLayoutAttributeTop multiplier:1 constant:1];
     if (privacyCheckboxInCenter) {
         box_cons_y = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemPrivacy attribute:NSLayoutAttributeCenterY multiplier:1 constant:0];
     }
     JVLayoutConstraint *box_cons_w = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemNone attribute:NSLayoutAttributeWidth multiplier:1 constant:privacyCheckboxSize];
     JVLayoutConstraint *box_cons_h = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemNone attribute:NSLayoutAttributeHeight multiplier:1 constant:privacyCheckboxSize];
-    
+
     uiconfig.checkViewConstraints = @[box_cons_x,box_cons_y,box_cons_w,box_cons_h];
     uiconfig.checkViewHorizontalConstraints = uiconfig.checkViewConstraints;
-    
+
     BOOL privacyCheckboxHidden = [[self getValue:config key:@"privacyCheckboxHidden"] boolValue];
     uiconfig.checkViewHidden = privacyCheckboxHidden;
-    
+
     NSNumber *privacyState = [self getValue:config key:@"privacyState"];
     uiconfig.privacyState = [privacyState boolValue];
-    
+
     NSString *uncheckedImgPath = [config objectForKey:@"uncheckedImgPath"];
     if (uncheckedImgPath) {
         uiconfig.uncheckedImg  = [UIImage imageNamed:uncheckedImgPath];
@@ -651,11 +654,11 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     BOOL privacyHintToast = [[self getValue:config key:@"privacyHintToast"] boolValue];
     if(privacyHintToast){
         uiconfig.customPrivacyAlertViewBlock = ^(UIViewController *vc) {
-            
+
             NSDictionary *privacy_linkDic = [vc valueForKey:@"_privacy_linkDic"];
             NSAttributedString *privacyAttributedString = [vc valueForKey:@"_privacyAttributedString"];
-            
-            
+
+
             DisagreeAlertViewController *alert = [[DisagreeAlertViewController alloc] init];
             alert.privacy_linkDic = privacy_linkDic;
             alert.privacyAttributedString = privacyAttributedString;
@@ -663,7 +666,7 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
                 [vc setValue:@(YES) forKey:@"_checked"];
                 UIButton *loginButon = [vc valueForKey:@"_loginButton"];
                 [loginButon sendActionsForControlEvents:UIControlEventTouchUpInside];
-                
+
             };
             alert.tapPrivacyWithStringCallBack = ^(NSString * _Nonnull str){
                 [alert dismissViewControllerAnimated:YES completion:nil];
@@ -672,19 +675,19 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
             };
             alert.modalPresentationStyle = UIModalPresentationOverFullScreen;
             [vc presentViewController:alert animated:NO completion:nil];
-            
+
         };
     }
-    
-    
-    
+
+
+
     BOOL isCenter = [[self getValue:config key:@"privacyTextCenterGravity"] boolValue];
     NSTextAlignment alignmet = isCenter?NSTextAlignmentCenter:NSTextAlignmentLeft;
     uiconfig.privacyTextAlignment = alignmet;
-    
+
     BOOL privacyWithBookTitleMark = [[self getValue:config key:@"privacyWithBookTitleMark"] boolValue];
     uiconfig.privacyShowBookSymbol = privacyWithBookTitleMark;
-    
+
     NSString *tempSting = @"";
     NSString *clauseName = [self getValue:config key:@"clauseName"];
     NSString *clauseUrl = [self getValue:config key:@"clauseUrl"];
@@ -692,29 +695,29 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
         uiconfig.appPrivacyOne  = @[clauseName,clauseUrl];
         tempSting = [tempSting stringByAppendingFormat:@"%@%@%@",(privacyWithBookTitleMark?@"《":@""),clauseName,(privacyWithBookTitleMark?@"》":@"")];
     }
-    
+
     NSString *clauseNameTwo = [self getValue:config key:@"clauseNameTwo"];
     NSString *clauseUrlTwo = [self getValue:config key:@"clauseUrlTwo"];
     if (clauseNameTwo && clauseUrlTwo) {
         uiconfig.appPrivacyTwo  = @[clauseNameTwo,clauseUrlTwo];
         tempSting = [tempSting stringByAppendingFormat:@"%@%@%@",(privacyWithBookTitleMark?@"《":@""),clauseNameTwo,(privacyWithBookTitleMark?@"》":@"")];
     }
-    
+
     NSArray *privacyComponents = [self getValue:config key:@"privacyText"];
     if (privacyComponents.count) {
         uiconfig.privacyComponents = privacyComponents;
         tempSting = [tempSting stringByAppendingString:[privacyComponents componentsJoinedByString:@"、"]];
     }
-    
+
     NSNumber *privacyTextSize = [self getValue:config key:@"privacyTextSize"];
     if (privacyTextSize) {
         uiconfig.privacyTextFontSize = [privacyTextSize floatValue];
     }
-    
+
     JVLayoutItem privacyLayoutItem = [self getLayotItem:[self getValue:config key:@"privacyVerticalLayoutItem"]];
     NSNumber *privacyOffsetY = [self getNumberValue:config key:@"privacyOffsetY"];
     NSNumber *privacyOffsetX = [self getValue:config key:@"privacyOffsetX"];
-    
+
     CGFloat privacyLeftSpace = 0;
     CGFloat privacyRightSpace = 15;
     if (privacyOffsetX == nil) {
@@ -726,26 +729,26 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
         privacyLeftSpace = [privacyOffsetX floatValue];
         privacyRightSpace = privacyLeftSpace - privacyCheckboxSize;
     }
-    
+
     tempSting = [tempSting stringByAppendingString:@"《xxx统一认证服务条款》"];
     CGFloat lableWidht = [UIScreen mainScreen].bounds.size.width - [privacyOffsetX floatValue]*2 - privacyCheckboxSize*3;
     CGSize lablesize = [tempSting boundingRectWithSize:CGSizeMake(lableWidht, MAXFLOAT)
                                           options:NSStringDrawingUsesLineFragmentOrigin
                                        attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:[privacyTextSize floatValue]+2]}
                                           context:nil].size;
-    
+
     JVLayoutConstraint *privacy_cons_left = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemSuper attribute:NSLayoutAttributeLeft multiplier:1 constant:privacyLeftSpace];
     JVLayoutConstraint *privacy_cons_right = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemSuper attribute:NSLayoutAttributeRight multiplier:1 constant:-(privacyRightSpace)];
     JVLayoutConstraint *privacy_cons_y = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemSuper attribute:NSLayoutAttributeBottom multiplier:1 constant:-[privacyOffsetY floatValue]];
     JVLayoutConstraint *privacy_cons_h = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemNone attribute:NSLayoutAttributeHeight multiplier:1 constant:lablesize.height];
-    
+
     if (privacyLayoutItem == JVLayoutItemNone) {
         uiconfig.privacyOffsetY = [privacyOffsetY floatValue];
     }else{
         uiconfig.privacyConstraints = @[privacy_cons_left,privacy_cons_y,privacy_cons_right,privacy_cons_h];
         uiconfig.privacyHorizontalConstraints = uiconfig.privacyConstraints;
     }
-    
+
     NSNumber *clauseBaseColor = [self getValue:config key:@"clauseBaseColor"];
     UIColor *privacyBasicColor =[UIColor grayColor];
     if(clauseBaseColor){
@@ -757,13 +760,13 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
         privacyColor =UIColorFromRGB([clauseColor integerValue]);
     }
     uiconfig.appPrivacyColor  = @[privacyBasicColor,privacyColor];
-    
+
     /************** 协议 web 页面 ***************/
     NSNumber *privacyNavColor = [self getValue:config key:@"privacyNavColor"];
     if (privacyNavColor) {
         uiconfig.agreementNavBackgroundColor  = UIColorFromRGB([privacyNavColor intValue]);
     }
-    
+
     NSString *privacyNavText = [self getValue:config key:@"privacyNavTitleTitle"];
     if (!privacyNavText) {
         privacyNavText =  @"运营商服务条款";
@@ -781,12 +784,12 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
                                         NSFontAttributeName:[UIFont systemFontOfSize:[privacyNavTitleTextSize floatValue]]};
     NSAttributedString *privayAttr = [[NSAttributedString alloc]initWithString:privacyNavText attributes:privayNavTextAttr];
     uiconfig.agreementNavText = privayAttr;
-    
+
     NSString *privacyNavReturnBtnImage =[self getValue:config key:@"privacyNavReturnBtnImage"];
     if(privacyNavReturnBtnImage){
         uiconfig.agreementNavReturnImage  = [UIImage imageNamed:privacyNavReturnBtnImage];
     }
-    
+
     // 自定义协议 1
     NSString *privacyNavTitleTitle1 = [self getValue:config key:@"privacyNavTitleTitle1"];
     if (!privacyNavTitleTitle1) {
@@ -796,7 +799,7 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
                                         NSFontAttributeName:[UIFont systemFontOfSize:[privacyNavTitleTextSize floatValue]]};
     NSAttributedString *privayAttr1 = [[NSAttributedString alloc]initWithString:privacyNavTitleTitle1 attributes:privayNavTextAttr1];
     uiconfig.firstPrivacyAgreementNavText = privayAttr1;
-    
+
     // 自定义协议 2
     NSString *privacyNavTitleTitle2 = [self getValue:config key:@"privacyNavTitleTitle2"];
     if (!privacyNavTitleTitle2) {
@@ -806,7 +809,7 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
                                         NSFontAttributeName:[UIFont systemFontOfSize:[privacyNavTitleTextSize floatValue]]};
     NSAttributedString *privayAttr2 = [[NSAttributedString alloc]initWithString:privacyNavTitleTitle2 attributes:privayNavTextAttr2];
     uiconfig.secondPrivacyAgreementNavText = privayAttr2;
-    
+
     /************** loading 框 ***************/
     JVLayoutConstraint *loadingConstraintX = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemSuper attribute:NSLayoutAttributeCenterX multiplier:1 constant:0];
     JVLayoutConstraint *loadingConstraintY = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemSuper attribute:NSLayoutAttributeCenterY multiplier:1 constant:0];
@@ -815,7 +818,7 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
 
     uiconfig.loadingConstraints = @[loadingConstraintX,loadingConstraintY,loadingConstraintW,loadingConstraintH];
     uiconfig.loadingHorizontalConstraints = uiconfig.loadingConstraints;
-    
+
     /************** 窗口模式样式设置 ***************/
     NSDictionary *popViewConfig = [self getValue:config key:@"popViewConfig"];
     if (popViewConfig) {
@@ -824,13 +827,13 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
         NSNumber *height = [self getValue:popViewConfig key:@"height"];
         NSNumber *offsetCenterX = [self getValue:popViewConfig key:@"offsetCenterX"];
         NSNumber *offsetCenterY = [self getValue:popViewConfig key:@"offsetCenterY"];
-        
+
         NSNumber *popViewCornerRadius = [self getValue:popViewConfig key:@"popViewCornerRadius"];
         NSNumber *backgroundAlpha = [self getValue:popViewConfig key:@"backgroundAlpha"];
         if ([isPopViewTheme boolValue]) {
             return;
         }
-        
+
         uiconfig.showWindow = YES;
         uiconfig.navCustom = YES;
         uiconfig.windowCornerRadius = [popViewCornerRadius floatValue];
@@ -853,12 +856,12 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
 - (UILabel *)addCustomTextWidget:(NSDictionary *)widgetDic {
     JVLog(@"Action - addCustomTextWidget:");
     UILabel *label = [[UILabel alloc] init];
-    
+
     NSInteger left = [[self getValue:widgetDic key:@"left"] integerValue];
     NSInteger top = [[self getValue:widgetDic key:@"top"] integerValue];
     NSInteger width = [[self getValue:widgetDic key:@"width"] integerValue];
     NSInteger height = [[self getValue:widgetDic key:@"height"] integerValue];
-    
+
     NSString *title = [self getValue:widgetDic key:@"title"];
     if (title) {
         label.text = title;
@@ -875,12 +878,12 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     if (textAlignment) {
         label.textAlignment = [self getTextAlignment:textAlignment];
     }
-    
+
     NSNumber *font = [self getValue:widgetDic key:@"titleFont"];
     if (font) {
         label.font = [UIFont systemFontOfSize:[font floatValue]];
     }
-    
+
     NSNumber *lines = [self getValue:widgetDic key:@"lines"];
     if (lines) {
         label.numberOfLines = [lines integerValue];
@@ -892,31 +895,31 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
         CGSize textSize = [label.text boundingRectWithSize:CGSizeMake(width, height) options:NSStringDrawingTruncatesLastVisibleLine attributes:attributes context:nil].size;
         height = textSize.height;
     }
-    
+
     NSNumber *isShowUnderline = [self getValue:widgetDic key:@"isShowUnderline"];
     if ([isShowUnderline boolValue]) {
         NSDictionary *attribtDic = @{NSUnderlineStyleAttributeName: [NSNumber numberWithInteger:NSUnderlineStyleSingle]};
         NSMutableAttributedString *attribtStr = [[NSMutableAttributedString alloc]initWithString:title attributes:attribtDic];
         label.attributedText = attribtStr;
     }
-    
+
     NSString *widgetId = [self getValue:widgetDic key:@"widgetId"];
-    
+
     label.frame = CGRectMake(left, top, width, height);
-    
+
     NSNumber *isClickEnable = [self getValue:widgetDic key:@"isClickEnable"];
     if ([isClickEnable boolValue]) {
         NSString *tag = @(left+top+width+height).stringValue;
         label.userInteractionEnabled = YES;
-        
+
         UITapGestureRecognizer *singleTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickTextWidgetAction:)];
         [singleTapGestureRecognizer setNumberOfTapsRequired:1];
         [label addGestureRecognizer:singleTapGestureRecognizer];
         singleTapGestureRecognizer.view.tag = [tag integerValue];
-        
+
         [self.customWidgetIdDic setObject:widgetId forKey:tag];
     }
-    
+
     return label;
 }
 - (void)clickTextWidgetAction:(UITapGestureRecognizer *)gestureRecognizer {
@@ -933,12 +936,12 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
 - (UIButton *)addCustomButtonWidget:(NSDictionary *)widgetDic {
     JVLog(@"Action - addCustomButtonWidget:");
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    
+
     NSInteger left = [[self getValue:widgetDic key:@"left"] integerValue];
     NSInteger top = [[self getValue:widgetDic key:@"top"] integerValue];
     NSInteger width = [[self getValue:widgetDic key:@"width"] integerValue];
     NSInteger height = [[self getValue:widgetDic key:@"height"] integerValue];
-    
+
     NSString *title = [self getValue:widgetDic key:@"title"];
     if (title) {
         [button setTitle:title forState:UIControlStateNormal];
@@ -956,35 +959,35 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     if (textAlignment) {
         button.contentHorizontalAlignment = [self getButtonTitleAlignment:textAlignment];
     }
-    
+
     NSNumber *font = [self getValue:widgetDic key:@"titleFont"];
     if (font) {
         button.titleLabel.font = [UIFont systemFontOfSize:[font floatValue]];
     }
 
-    
+
     NSNumber *isShowUnderline = [self getValue:widgetDic key:@"isShowUnderline"];
     if ([isShowUnderline boolValue]) {
         NSDictionary *attribtDic = @{NSUnderlineStyleAttributeName: [NSNumber numberWithInteger:NSUnderlineStyleSingle]};
         NSMutableAttributedString *attribtStr = [[NSMutableAttributedString alloc]initWithString:title attributes:attribtDic];
         button.titleLabel.attributedText = attribtStr;
     }
-    
+
     button.frame = CGRectMake(left, top, width, height);
-    
+
     NSNumber *isClickEnable = [self getValue:widgetDic key:@"isClickEnable"];
     button.userInteractionEnabled = [isClickEnable boolValue];
     [button addTarget:self action:@selector(clickCustomWidgetAction:) forControlEvents:UIControlEventTouchUpInside];
 
-     NSString *widgetId = [self getValue:widgetDic key:@"widgetId"];
+    NSString *widgetId = [self getValue:widgetDic key:@"widgetId"];
 
     NSString *tag = @(left+top+width+height).stringValue;
     button.tag = [tag integerValue];
-    
+
 
     [self.customWidgetIdDic setObject:widgetId forKey:tag];
-    
-    
+
+
     NSString *btnNormalImageName = [self getValue:widgetDic key:@"btnNormalImageName"];
     NSString *btnPressedImageName = [self getValue:widgetDic key:@"btnPressedImageName"];
     if (!btnPressedImageName) {
@@ -997,6 +1000,12 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
         [button setBackgroundImage:[UIImage imageNamed:btnPressedImageName] forState:UIControlStateHighlighted];
         [button setBackgroundImage:[UIImage imageNamed:btnPressedImageName] forState:UIControlStateSelected];
     }
+
+    if ([widgetId isEqualToString:@"jv_close_button"]) {
+        [button expendWithWidth:15 andHeight:15 isPadding:YES];
+    }
+
+
     
     return button;
 }

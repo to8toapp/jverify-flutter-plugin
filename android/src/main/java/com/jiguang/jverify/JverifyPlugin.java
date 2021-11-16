@@ -9,7 +9,9 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
@@ -18,12 +20,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -1079,30 +1083,30 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
     private void addCustomButtonWidgets(Map para, JVerifyUIConfig.Builder builder) {
         Log.d(TAG, "addCustomButtonWidgets: para = " + para);
 
-        Button customView = new Button(context);
+        final ImageButton customView = new ImageButton(context);
 
         //设置text
-        final String title = (String) para.get("title");
-        customView.setText(title);
+//        final String title = (String) para.get("title");
+//        customView.setText(title);
 
         //设置字体颜色
-        Object titleColor = para.get("titleColor");
-        if (titleColor != null) {
-            if (titleColor instanceof Long) {
-                customView.setTextColor(((Long) titleColor).intValue());
-            } else {
-                customView.setTextColor((Integer) titleColor);
-            }
-        }
+//        Object titleColor = para.get("titleColor");
+//        if (titleColor != null) {
+//            if (titleColor instanceof Long) {
+//                customView.setTextColor(((Long) titleColor).intValue());
+//            } else {
+//                customView.setTextColor((Integer) titleColor);
+//            }
+//        }
 
         //设置字体大小
-        Object font = para.get("titleFont");
-        if (font != null) {
-            double titleFont = (double) font;
-            if (titleFont > 0) {
-                customView.setTextSize((float) titleFont);
-            }
-        }
+//        Object font = para.get("titleFont");
+//        if (font != null) {
+//            double titleFont = (double) font+20;
+//            if (titleFont > 0) {
+//                customView.setTextSize((float) titleFont);
+//            }
+//        }
 
 
         //设置背景颜色
@@ -1124,34 +1128,34 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
         setButtonSelector(customView, btnNormalImageName, btnPressedImageName);
 
         //下划线
-        Boolean isShowUnderline = (Boolean) para.get("isShowUnderline");
-        if (isShowUnderline) {
-            customView.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);//下划线
-            customView.getPaint().setAntiAlias(true);//抗锯齿
-        }
+//        Boolean isShowUnderline = (Boolean) para.get("isShowUnderline");
+//        if (isShowUnderline) {
+//            customView.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);//下划线
+//            customView.getPaint().setAntiAlias(true);//抗锯齿
+//        }
 
         //设置对齐方式
-        Object alignmet = para.get("textAlignment");
-        if (alignmet != null) {
-            String textAlignment = (String) alignmet;
-            int gravity = getAlignmentFromString(textAlignment);
-            customView.setGravity(gravity);
-        }
+//        Object alignmet = para.get("textAlignment");
+//        if (alignmet != null) {
+//            String textAlignment = (String) alignmet;
+//            int gravity = getAlignmentFromString(textAlignment);
+//            customView.setGravity(gravity);
+//        }
 
-        boolean isSingleLine = (Boolean) para.get("isSingleLine");
-        customView.setSingleLine(isSingleLine);//设置是否单行显示，多余的就 ...
-
-        int lines = (int) para.get("lines");
-        customView.setLines(lines);//设置行数
+//        boolean isSingleLine = (Boolean) para.get("isSingleLine");
+//        customView.setSingleLine(isSingleLine);//设置是否单行显示，多余的就 ...
+//
+//        int lines = (int) para.get("lines");
+//        customView.setLines(lines);//设置行数
 
 
         // 位置
-        int left = (int) para.get("left");
-        int top = (int) para.get("top");
-        int width = (int) para.get("width");
-        int height = (int) para.get("height");
+        int left = (int) para.get("left")-10;
+        int top = (int) para.get("top")-10;
+        int width = (int) para.get("width")+20;
+        int height = (int) para.get("height")+20;
 
-        RelativeLayout.LayoutParams mLayoutParams1 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams mLayoutParams1 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         mLayoutParams1.leftMargin = dp2Pix(context, (float) left);
         mLayoutParams1.topMargin = dp2Pix(context, (float) top);
         if (width > 0) {
@@ -1162,6 +1166,10 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
             ;
         }
         customView.setLayoutParams(mLayoutParams1);
+
+
+        customView.setBackgroundColor(Color.WHITE);
+
 
 
         /// 点击事件 id
@@ -1233,11 +1241,10 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
      * @param normalImageName 常态下背景图
      * @param pressImageName  点击时背景图
      */
-    private void setButtonSelector(Button button, String normalImageName, String pressImageName) {
+    private void setButtonSelector(ImageButton button, String normalImageName, String pressImageName) {
         Log.d(TAG, "setButtonSelector normalImageName=" + normalImageName + "，pressImageName=" + pressImageName);
 
         StateListDrawable drawable = new StateListDrawable();
-
         Resources res = context.getResources();
 
         final int normal_resId = getResourceByReflect(normalImageName);
@@ -1254,7 +1261,12 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
         //选中
         drawable.addState(new int[]{android.R.attr.state_pressed}, select_drawable);
 
-        button.setBackground(drawable);
+//        button.setBackground(drawable);
+        button.setImageDrawable(drawable);
+//        button.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        button.setScaleType(ImageView.ScaleType.FIT_XY);
+        button.setAdjustViewBounds(true);
+
     }
 
     /**
