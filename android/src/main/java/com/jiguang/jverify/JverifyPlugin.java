@@ -640,6 +640,7 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
 
         Object uncheckedImgPath = valueForKey(uiconfig, "uncheckedImgPath");
         Object checkedImgPath = valueForKey(uiconfig, "checkedImgPath");
+        Object checkedSelectorXmlPath = valueForKey(uiconfig, "checkedSelectorXmlPath");
 
         Object privacyTopOffsetY = valueForKey(uiconfig, "privacyTopOffsetY");
         Object privacyOffsetY = valueForKey(uiconfig, "privacyOffsetY");
@@ -871,13 +872,13 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
         if (uncheckedImgPath != null) {
             int res_id = getResourceByReflect((String) uncheckedImgPath);
             if (res_id > 0) {
-                builder.setUncheckedImgPath((String) uncheckedImgPath);
+                builder.setUncheckedImgPath((String) checkedSelectorXmlPath);
             }
         }
         if (checkedImgPath != null) {
             int res_id = getResourceByReflect((String) checkedImgPath);
             if (res_id > 0) {
-                builder.setCheckedImgPath((String) checkedImgPath);
+                builder.setCheckedImgPath((String) checkedSelectorXmlPath);
             }
         }
 
