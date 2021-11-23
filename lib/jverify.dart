@@ -506,6 +506,7 @@ class JVUIConfig {
   /// 隐私协议栏
   String? uncheckedImgPath;
   String? checkedImgPath;
+  String? checkedSelectorXmlPath;
   int? privacyCheckboxSize;
   bool privacyHintToast = true; //设置隐私条款不选中时点击登录按钮默认弹出toast。
   bool privacyState = false; //设置隐私条款默认选中状态，默认不选中
@@ -601,6 +602,7 @@ class JVUIConfig {
       "loginBtnUnableImage": loginBtnUnableImage ??= null,
       "uncheckedImgPath": uncheckedImgPath ??= null,
       "checkedImgPath": checkedImgPath ??= null,
+      "checkedSelectorXmlPath": checkedSelectorXmlPath ??= null,
       "privacyCheckboxSize": privacyCheckboxSize ??= null,
       "privacyHintToast": privacyHintToast,
       "privacyOffsetY": privacyOffsetY ??= null,
