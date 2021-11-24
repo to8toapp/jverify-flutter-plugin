@@ -37,6 +37,7 @@ import com.cmic.sso.sdk.activity.LoginAuthActivity;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ import cn.jiguang.verifysdk.api.JVerifyUIClickCallback;
 import cn.jiguang.verifysdk.api.JVerifyUIConfig;
 import cn.jiguang.verifysdk.api.LoginSettings;
 import cn.jiguang.verifysdk.api.PreLoginListener;
+import cn.jiguang.verifysdk.api.PrivacyBean;
 import cn.jiguang.verifysdk.api.RequestCallback;
 import cn.jiguang.verifysdk.api.VerifyListener;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -904,7 +906,7 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
         if (privacyText != null) {
             ArrayList<String> privacyTextList = (ArrayList) privacyText;
             privacyTextList.addAll(Arrays.asList("", "", "", ""));
-            builder.setPrivacyText(privacyTextList.get(0), privacyTextList.get(1), privacyTextList.get(2), privacyTextList.get(3));
+            builder.setPrivacyText(privacyTextList.get(0), privacyTextList.get(1));
         }
 
         builder.setPrivacyTextCenterGravity((Boolean) privacyTextCenterGravity);
@@ -935,6 +937,15 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
         builder.setAppPrivacyColor(baseColor, color);
         if (CLAUSE_NAME_TWO != null && CLAUSE_URL_TWO != null) {
             builder.setAppPrivacyTwo((String) CLAUSE_NAME_TWO, (String) CLAUSE_URL_TWO);
+        }
+
+        if (CLAUSE_NAME != null && CLAUSE_URL != null && CLAUSE_NAME_TWO != null && CLAUSE_URL_TWO != null){
+            PrivacyBean privacyBean1 = new PrivacyBean((String) CLAUSE_NAME, (String) CLAUSE_URL,"、");
+            PrivacyBean privacyBean2 = new PrivacyBean((String) CLAUSE_NAME_TWO, (String) CLAUSE_URL_TWO,"和");
+            List<PrivacyBean> list = new ArrayList<>();
+            list.add(privacyBean1);
+            list.add(privacyBean2);
+            builder.setPrivacyNameAndUrlBeanList(list);
         }
 
         /************** 隐私 web 页面 ***************/
