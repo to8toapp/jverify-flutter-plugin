@@ -76,6 +76,7 @@ class Jverify {
 
   /// 授权页的点击事件， @since v2.4.0
   addAuthPageEventListener(JVAuthPageEventListener callback) {
+    _eventHanders.authPageEvents.clear();
     _eventHanders.authPageEvents.add(callback);
   }
 
