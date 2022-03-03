@@ -133,7 +133,7 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
 
             @Override
             public void onActivityStopped(Activity activity) {
-
+                JVerificationInterface.dismissLoginAuthActivity();
             }
 
             @Override
