@@ -624,31 +624,7 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     }
     BOOL privacyCheckboxInCenter = [[self getValue:config key:@"privacyCheckboxInCenter"] boolValue];
 
-    JVLayoutConstraint *box_cons_x = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemSuper attribute:NSLayoutAttributeLeft multiplier:1 constant:20];
-    JVLayoutConstraint *box_cons_y = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemPrivacy attribute:NSLayoutAttributeCenterY multiplier:1 constant:1];
-    if (privacyCheckboxInCenter) {
-        box_cons_y = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemPrivacy attribute:NSLayoutAttributeCenterY multiplier:1 constant:0];
-    }
-    JVLayoutConstraint *box_cons_w = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemNone attribute:NSLayoutAttributeWidth multiplier:1 constant:privacyCheckboxSize];
-    JVLayoutConstraint *box_cons_h = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemNone attribute:NSLayoutAttributeHeight multiplier:1 constant:privacyCheckboxSize];
-
-    uiconfig.checkViewConstraints = @[box_cons_x,box_cons_y,box_cons_w,box_cons_h];
-    uiconfig.checkViewHorizontalConstraints = uiconfig.checkViewConstraints;
-
-    BOOL privacyCheckboxHidden = [[self getValue:config key:@"privacyCheckboxHidden"] boolValue];
-    uiconfig.checkViewHidden = privacyCheckboxHidden;
-
-    NSNumber *privacyState = [self getValue:config key:@"privacyState"];
-    uiconfig.privacyState = [privacyState boolValue];
-
-    NSString *uncheckedImgPath = [config objectForKey:@"uncheckedImgPath"];
-    if (uncheckedImgPath) {
-        uiconfig.uncheckedImg  = [UIImage imageNamed:uncheckedImgPath];
-    }
-    NSString *checkedImgPath = [config objectForKey:@"checkedImgPath"];
-    if (checkedImgPath) {
-        uiconfig.checkedImg  = [UIImage imageNamed:checkedImgPath];
-    }
+    
 
     /************** privacy ***************/
     BOOL privacyHintToast = [[self getValue:config key:@"privacyHintToast"] boolValue];
@@ -760,6 +736,34 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
         privacyColor =UIColorFromRGB([clauseColor integerValue]);
     }
     uiconfig.appPrivacyColor  = @[privacyBasicColor,privacyColor];
+    
+    /**********checkbox******/
+    
+    JVLayoutConstraint *box_cons_x = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemSuper attribute:NSLayoutAttributeLeft multiplier:1 constant:20];
+    JVLayoutConstraint *box_cons_y = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemPrivacy attribute:NSLayoutAttributeTop multiplier:1 constant:-8];
+    if (privacyCheckboxInCenter) {
+        box_cons_y = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemPrivacy attribute:NSLayoutAttributeCenterY multiplier:1 constant:0];
+    }
+    JVLayoutConstraint *box_cons_w = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemNone attribute:NSLayoutAttributeWidth multiplier:1 constant:privacyCheckboxSize];
+    JVLayoutConstraint *box_cons_h = [JVLayoutConstraint constraintWithAttribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:JVLayoutItemNone attribute:NSLayoutAttributeHeight multiplier:1 constant:privacyCheckboxSize];
+
+    uiconfig.checkViewConstraints = @[box_cons_x,box_cons_y,box_cons_w,box_cons_h];
+    uiconfig.checkViewHorizontalConstraints = uiconfig.checkViewConstraints;
+
+    BOOL privacyCheckboxHidden = [[self getValue:config key:@"privacyCheckboxHidden"] boolValue];
+    uiconfig.checkViewHidden = privacyCheckboxHidden;
+
+    NSNumber *privacyState = [self getValue:config key:@"privacyState"];
+    uiconfig.privacyState = [privacyState boolValue];
+
+    NSString *uncheckedImgPath = [config objectForKey:@"uncheckedImgPath"];
+    if (uncheckedImgPath) {
+        uiconfig.uncheckedImg  = [UIImage imageNamed:uncheckedImgPath];
+    }
+    NSString *checkedImgPath = [config objectForKey:@"checkedImgPath"];
+    if (checkedImgPath) {
+        uiconfig.checkedImg  = [UIImage imageNamed:checkedImgPath];
+    }
 
     /************** 协议 web 页面 ***************/
     NSNumber *privacyNavColor = [self getValue:config key:@"privacyNavColor"];
