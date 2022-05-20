@@ -39,7 +39,7 @@
             android:lineSpacingExtra="5dp"
             android:paddingHorizontal="20dp"
             android:text="阅读并同意中国联通认证服务协议、土巴兔用户服务协议和隐私政策可继续登录。"
-            android:textColor="#ff666666"
+            android:textColor="#ffAAAAAA"
             android:textSize="14sp" />
 
 
