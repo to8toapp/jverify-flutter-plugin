@@ -2,5 +2,6 @@
 <resources>
 
     <drawable name="white">#ffffffff</drawable>
+    <color name="main_color">#FFD5BB8B</color>
 
 </resources>

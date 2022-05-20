@@ -78,7 +78,7 @@
                 android:paddingRight="16dp"
                 android:paddingBottom="10dp"
                 android:text="同意"
-                android:background="#ff06c792"
+                android:background="@color/main_color"
                 android:textColor="#ffffffff"/>
         </LinearLayout>
 

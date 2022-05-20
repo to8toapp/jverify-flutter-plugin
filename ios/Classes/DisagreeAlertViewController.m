@@ -93,7 +93,7 @@ static const NSString *kPrivacyProtocol = @"隐私政策";
     confirmButton.frame = CGRectMake(_viewWidth - 40 - 106, 160, 106, 42);
     [confirmButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [confirmButton setTitle:@"同意" forState:UIControlStateNormal];
-    confirmButton.backgroundColor = [UIColor colorWithRed:0.14 green:0.777 blue:0.49 alpha:1];
+    confirmButton.backgroundColor = [UIColor colorWithRed:0.835 green:0.733 blue:0.545 alpha:1];
     if (@available(iOS 8.2, *)) {
         confirmButton.titleLabel.font = [UIFont systemFontOfSize:16 weight:UIFontWeightMedium];
     }
