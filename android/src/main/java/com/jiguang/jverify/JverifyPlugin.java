@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
@@ -152,32 +153,36 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
      * 自定义一键登录页面（LoginAuthActivity）对不同意协议的自定义处理：弹框提示
      */
     private void hookLoginAuthActivityDisagreeHandle(Activity loginAuthActivity) {
-        FrameLayout  view =  (FrameLayout)loginAuthActivity.getWindow().getDecorView();
-        final View button = view.findViewById(1007);
-        final TextView textView = view.findViewById(1010);
-        ViewGroup textViewParent = (ViewGroup)textView.getParent();
-        View temp = textViewParent.getChildAt(0);
-        if (temp instanceof CheckBox) {
-            mCheckBox = (CheckBox)temp;
-        }
-        if (button != null) {
-            originalLoginOnClick = OnClickListenerProxy.hookOnClickListener(button, new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-                    if (mCheckBox.isChecked()) {
-                        originalLoginOnClick.onClick(button);
-                        return;
-                    }
-                    mCheckTipsDialog = new EasyLoginCheckTipsDialog(currentActivity, textView.getText(), new EasyLoginCheckTipsDialog.IOnEasyLoginListener() {
-                        @Override
-                        public void onAgreeClicked() {
-                            mCheckBox.setChecked(true);
+        try {
+            FrameLayout view = (FrameLayout) loginAuthActivity.getWindow().getDecorView();
+            final View button = view.findViewById(1007);
+            final TextView textView = view.findViewById(1010);
+            ViewGroup textViewParent = (ViewGroup) textView.getParent();
+            View temp = textViewParent.getChildAt(0);
+            if (temp instanceof CheckBox) {
+                mCheckBox = (CheckBox) temp;
+            }
+            if (button != null) {
+                originalLoginOnClick = OnClickListenerProxy.hookOnClickListener(button, new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        if (mCheckBox.isChecked()) {
                             originalLoginOnClick.onClick(button);
+                            return;
                         }
-                    });
-                    mCheckTipsDialog.show();
-                }
-            });
+                        mCheckTipsDialog = new EasyLoginCheckTipsDialog(currentActivity, textView.getText(), new EasyLoginCheckTipsDialog.IOnEasyLoginListener() {
+                            @Override
+                            public void onAgreeClicked() {
+                                mCheckBox.setChecked(true);
+                                originalLoginOnClick.onClick(button);
+                            }
+                        });
+                        mCheckTipsDialog.show();
+                    }
+                });
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -1001,11 +1006,14 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
         Log.d(TAG, "addCustomTextView " + para);
 
         TextView customView = new TextView(context);
-        ;
+
 
         //设置text
         final String title = (String) para.get("title");
         customView.setText(title);
+        if(title!=null&&title.contains("登录设计本")){
+            customView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));//加粗
+        }
 
         //设置字体颜色
         Object titleColor = para.get("titleColor");

@@ -870,6 +870,9 @@ JVLayoutConstraint *JVLayoutHeight(CGFloat height) {
     if (title) {
         label.text = title;
     }
+    if(title.contains(@"登录设计本")){
+       label.font = [UIFont boldSystemFontOfSize:20];
+    }
     NSNumber *titleColor = [self getValue:widgetDic key:@"titleColor"];
     if (titleColor) {
         label.textColor = UIColorFromRGB([titleColor integerValue]);
