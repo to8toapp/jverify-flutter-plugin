@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <drawable name="white">#ffffffff</drawable>
+    <color name="white">#ffffffff</color>
     <color name="main_color">#FFD5BB8B</color>
 
 </resources>

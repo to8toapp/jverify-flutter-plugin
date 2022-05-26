@@ -74,7 +74,7 @@ static const NSString *kPrivacyProtocol = @"隐私政策";
         [self addProtocolAttributesFor:attributed withString:key withUrl:obj];
     }];
     textView.attributedText = attributed;
-    textView.linkTextAttributes = @{NSForegroundColorAttributeName: [UIColor blackColor]};
+    textView.linkTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:102.0/255.0 green:102.0/255.0 blue:102.0/255.0 alpha:1.0]};
     [alertView addSubview:textView];
     
     UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];

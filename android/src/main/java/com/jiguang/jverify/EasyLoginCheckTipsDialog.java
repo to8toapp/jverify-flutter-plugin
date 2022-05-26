@@ -2,10 +2,14 @@ package com.jiguang.jverify;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
@@ -90,8 +94,10 @@ public class EasyLoginCheckTipsDialog extends Dialog {
         TextView tvContent = findViewById(R.id.tv_content);
 
         SpannableStringBuilder spannableStringBuilder = SpannableStringBuilder.valueOf(mProtocolText);
-        spannableStringBuilder.delete(0,6);
-        spannableStringBuilder.append("可继续登录");
+//        spannableStringBuilder.delete(0,6);
+        String appendStr="可继续登录";
+        spannableStringBuilder.append(appendStr);
+        spannableStringBuilder.setSpan(new ForegroundColorSpan(Color.parseColor("#AAAAAA")), spannableStringBuilder.length()-appendStr.length(), spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
 
         tvContent.setText(spannableStringBuilder);
         tvContent.setClickable(true);
