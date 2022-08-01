@@ -42,6 +42,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.jiguang.api.JCoreInterface;
+import cn.jiguang.api.utils.JCollectionAuth;
 import cn.jiguang.verifysdk.CtLoginActivity;
 import cn.jiguang.verifysdk.api.AuthPageEventListener;
 import cn.jiguang.verifysdk.api.JVerificationInterface;
@@ -251,8 +253,8 @@ public class JverifyPlugin implements FlutterPlugin,MethodCallHandler {
      * SDK 初始换
      */
     private void setup(MethodCall call, Result result) {
-        Log.d(TAG, "Action - setup:");
-
+        Log.d(TAG, "Action - setup:"+context);
+        JCoreInterface.setImLBSEnable(context, false);
         Object timeout = getValueByKey(call, "timeout");
         JVerificationInterface.init(context, (Integer) timeout, new RequestCallback<String>() {
             @Override
