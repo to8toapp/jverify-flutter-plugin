@@ -32,22 +32,29 @@ android {
     lintOptions {
         disable 'InvalidPackage'
     }
-    buildTypes {
-        release {
-            minifyEnabled true
-            useProguard true
-            // library 混淆 -> 随 library 引用，自动添加到 apk 打包混淆
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'consumer-rules.pro'
-        }
-        debug {
-            minifyEnabled false
-            useProguard false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'consumer-rules.pro'
-        }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
+    
+//    buildTypes {
+//        release {
+//            minifyEnabled true
+//            useProguard true
+//            // library 混淆 -> 随 library 引用，自动添加到 apk 打包混淆
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'consumer-rules.pro'
+//        }
+//        debug {
+//            minifyEnabled false
+//            useProguard false
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'consumer-rules.pro'
+//        }
+//    }
 
 
 }
+
 
 dependencies {
     implementation 'cn.jiguang.sdk:jverification:2.7.6'
